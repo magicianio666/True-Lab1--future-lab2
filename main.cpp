@@ -1,4 +1,4 @@
-#include <exception>
+#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <strstream>
@@ -44,15 +44,19 @@ void save(tube t, cs c)
 {
     fstream fs;
     string filename;
+    //tube t1; cs c1;
     cout<<"Type file name (without file format):";
     cin>>filename;
     fs.open(filename+".Vasiutin",fstream::out);
     //fs.open("npz1.Vasiutin",fstream::out);
     if (fs.is_open())
     {
-    fs<<t.id<<endl<<t.dlina<<endl<<t.diametr<<endl<<t.inorder<<endl;
-    fs<<c.id<<endl<<c.name<<endl<<c.cech_n<<endl<<c.cech_w<<endl<<c.eff<<endl;
-    fs.close();
+    //for (int i=1;(t1.id!=t.id||c1.id!=c.id);i++)
+        fs<<"t"<<endl<<t.id<<endl<<t.dlina<<endl<<t.diametr<<endl<<t.inorder<<endl;
+        fs<<"c"<<endl<<c.id<<endl<<c.name<<endl<<c.cech_n<<endl<<c.cech_w<<endl<<c.eff<<endl;
+        fs.close();
+        //t1=t;
+        //c1=c;
     }
     else
     {
@@ -109,13 +113,8 @@ void load(tube t,cs c)
 tube newtube ()
 {
     tube t;
-    char char1;
 
-    do{
-        safeinput();
-    cout<<"Type pipe id (numbers only):";
-    cin>>t.id;
-    }while(cin.fail());
+    //cout<<"Pipe id:"<< <<endl;
 
     do{
         safeinput();
@@ -131,13 +130,9 @@ tube newtube ()
 
     do{
         safeinput();
-    cout<<"Type pipe condition (y/n):";
-    cin>>char1;
-    if (char1=='y')
-        t.inorder=1;
-    else if (char1=='n')
-        t.inorder=0;
-    }while (char1!='y'&&char1!='n');
+    cout<<"Type pipe condition (1/0):";
+    cin>>t.inorder;
+    }while (t.inorder!=1&&t.inorder!=0);
 
     return t;
 }
@@ -167,11 +162,12 @@ cs newcs ()
     cin>>c.cech_w;
     }while(c.cech_w<0||c.cech_w>c.cech_n||cin.fail());
 
-    do{
+    c.eff=round(100*c.cech_w/c.cech_n);
+    /*do{
         safeinput();
     cout<<"Type compression station effectiveness:";
     cin>>c.eff;
-    }while(cin.fail());
+    }while(cin.fail());*/
     return c;
 }
 void printstruct(tube t)
@@ -225,7 +221,6 @@ cs editcs (cs c)
     }while(cin.fail());
     return c;
 }
-void exit(int const status);
 
 
 int main()
@@ -234,8 +229,8 @@ int main()
     setlocale(LC_ALL, "Russian");
 
         printmenu();
-        tryAgain:
-
+        while (true)
+    {
         do{
         cout<<"Type your command:";
         cin>> S;
@@ -246,21 +241,21 @@ int main()
         else
         break;
         }while(true);
-        tube t;
-        cs c;
+
+        tube t;//{0,0,0,0};
+        cs c;//{0,"no current objects",0,0,0};
+
         switch(S) {
             case 1:     //Add tube
             {
                 t=newtube();
                 //AllData.push_back(lineData);
-                goto tryAgain;
             break;
             }
 
             case 2:     //Add compression station
             {
                 c=newcs();
-                goto tryAgain;
             break;
             }
 
@@ -268,7 +263,6 @@ int main()
             {
                 printstruct(t);
                 printstruct(c);
-                goto tryAgain;
             break;
             }
 
@@ -276,7 +270,6 @@ int main()
             {
                 printstruct(t);
                 t=edittube(t);
-                goto tryAgain;
             break;
             }
 
@@ -284,14 +277,12 @@ int main()
             {
                 printstruct(c);
                 c=editcs(c);
-                goto tryAgain;
             break;
             }
 
             case 6:     //Save all updates
             {
                 save(t,c);
-                goto tryAgain;
             break;
             }
 
@@ -300,13 +291,13 @@ int main()
                 load(t,c);
                 printstruct(t);
                 printstruct(c);
-                goto tryAgain;
             break;
             }
 
             case 8:     //Clear screen
             {
                 system("cls");
+                printmenu();
             break;
             }
 
@@ -318,8 +309,8 @@ int main()
             default:
             {
                 cout<<"Invalid command number"<<endl;
-                goto tryAgain;
             break;
+            }
         }
     }
     return 0;
